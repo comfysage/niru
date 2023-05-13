@@ -82,16 +82,17 @@ impl Link {
         if !absolute_target.exists() {
             return Err(format!("target `{}` doesn't exist.", self.target));
         }
-        if Path::new(&self.source).exists() {
+        let absolute_source = utils::extend_path(&self.source);
+        if Path::new(&absolute_source).exists() {
             // remove source
             self.remove_source()?;
         }
         let abs_source = utils::get_absolute_path(absolute_target)?;
-        symlink(abs_source, self.source.clone()).map_err(|e| {
+        symlink(&abs_source, &absolute_source).map_err(|e| {
             format!(
                 "couldn't link `{}` to `{}`: {}",
-                self.target,
-                self.source,
+                abs_source,
+                absolute_source,
                 e.to_string()
             )
         })?;
